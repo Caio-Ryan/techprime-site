@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agendamento de Serviços de T.I.</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f7f9fc;
+    color: #333;
+  }
+  header {
+    background: #0078d7;
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  header h1 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  header p {
+    font-size: 1.125rem;
+    font-weight: 300;
+  }
+  main {
+    max-width: 720px;
+    margin: 2rem auto 4rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  h2 {
+    color: #0078d7;
+    margin-top: 0;
+    font-weight: 600;
+    border-bottom: 2px solid #0078d7;
+    padding-bottom: 0.3rem;
+  }
+  ul.services-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 2rem;
+  }
+  ul.services-list li {
+    background: #e1f0ff;
+    margin-bottom: 0.75rem;
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    color: #004a9e;
+    transition: transform 0.4s ease;
+  }
+  ul.services-list li.animate {
+    animation: bounce 0.6s ease;
+    background-color: #cce7ff;
+  }
+  @keyframes bounce {
+    0%   { transform: translateY(0); }
+    30%  { transform: translateY(-10px); }
+    50%  { transform: translateY(5px); }
+    70%  { transform: translateY(-7px); }
+    100% { transform: translateY(0); }
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #444;
+    margin-top: 1rem;
+  }
+  select, input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"] {
+    padding: 0.5rem;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  select:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="date"]:focus, input[type="time"]:focus {
+    border-color: #0078d7;
+    outline: none;
+  }
+  button {
+    margin-top: 2rem;
+    background-color: #0078d7;
+    color: white;
+    padding: 0.75rem;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #005ea1;
+  }
+  .confirmation {
+    margin-top: 2rem;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1.5px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 1rem;
+    font-weight: 600;
+    display: none;
+  }
+  @media (max-width: 480px) {
+    body {
+      padding: 0 0.5rem;
+    }
+    main {
+      padding: 1rem;
+      margin: 1rem auto 3rem auto;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>TechPrime</h1>
+  <p>Segurança | Atendimento rápido e profissional</p>
+</header>
+<main>
+  <section>
+    <h2>Serviços Disponíveis</h2>
+    <ul class="services-list">
+      <li data-service="Instalação Windows/Office">Instalação e ativação do Windows e do Pacote Office</li>
+      <li data-service="Limpeza de hardware">Limpeza de hardware</li>
+      <li data-service="Limpeza de software">Limpeza de software</li>
+    </ul>
+  </section>
+  <section>
+    <h2>Agende seu horário</h2>
+    <form id="bookingForm" novalidate>
+      <label for="service">Selecione o serviço:</label>
+      <select id="service" name="service" required>
+        <option value="" disabled selected>-- Escolha um serviço --</option>
+        <option value="Instalação Windows/Office">Instalação Windows/Office</option>
+        <option value="Limpeza de hardware">Limpeza de hardware</option>
+        <option value="Limpeza de software">Limpeza de software</option>
+      </select>
+
+      <label for="date">Data do atendimento:</label>
+      <input type="date" id="date" name="date" required min="" />
+
+      <label for="time">Hora do atendimento:</label>
+      <input type="time" id="time" name="time" required min="09:00" max="18:00" />
+
+      <label for="name">Seu nome completo:</label>
+      <input type="text" id="name" name="name" required minlength="3" placeholder="Nome completo" />
+
+      <label for="email">E-mail para contato:</label>
+      <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com" />
+
+      <label for="phone">Telefone (opcional):</label>
+      <input type="tel" id="phone" name="phone" placeholder="(xx) xxxx-xxxx ou (xx) xxxxx-xxxx" pattern="[\d\s\-\+\(\)]+" />
+
+      <button type="submit">Agendar</button>
+    </form>
+    <div class="confirmation" id="confirmationMessage"></div>
+  </section>
+</main>
+<script>
+  // Set min date for the date input to today
+  const dateInput = document.getElementById('date');
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.setAttribute('min', today);
+
+  const form = document.getElementById('bookingForm');
+  const confirmation = document.getElementById('confirmationMessage');
+  const servicesListItems = document.querySelectorAll('ul.services-list li');
+  const serviceSelect = document.getElementById('service');
+
+  // Remove animation class helper
+  function removeAnimationClasses() {
+    servicesListItems.forEach(li => {
+      li.classList.remove('animate');
+    });
+  }
+
+  // Listen for service selection changes and animate corresponding list item
+  serviceSelect.addEventListener('change', () => {
+    removeAnimationClasses();
+    const selectedValue = serviceSelect.value;
+    servicesListItems.forEach(li => {
+      if (li.getAttribute('data-service') === selectedValue) {
+        // To restart animation if already applied, remove then add with timeout
+        li.classList.remove('animate');
+        void li.offsetWidth; // trigger reflow to restart animation
+        li.classList.add('animate');
+      }
+    });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // Validate time within working hours (09:00 - 18:00)
+    const time = document.getElementById('time').value;
+    if (time < '09:00' || time > '18:00') {
+      alert('Por favor, selecione um horário entre 09:00 e 18:00.');
+      return;
+    }
+
+    // Get form data
+    const service = form.service.value;
+    const date = form.date.value;
+    const timeSelected = time;
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+
+    // Show a confirmation message
+    confirmation.style.display = 'block';
+    confirmation.innerHTML = `
+      Obrigado, <strong>${name}</strong>!<br/>
+      Seu agendamento para <strong>${service}</strong> está marcado para <strong>${date}</strong> às <strong>${timeSelected}</strong>.<br/>
+      Entraremos em contato pelo e-mail <strong>${email}</strong> para confirmar o horário.<br/>
+      ${phone ? 'Telefone: ' + phone + '<br/>' : ''}
+      Até breve!
+    `;
+
+    // Reset form
+    form.reset();
+    removeAnimationClasses();
+  });
+</script>
+</body>
+</html>
+
