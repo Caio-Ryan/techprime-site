@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Agendamento de Serviços de T.I.</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agendamento de Serviços de T.I.</title>
+  <style>
   /* Reset and base */
   * {
     box-sizing: border-box;
@@ -144,7 +144,7 @@
   </section>
   <section>
     <h2>Agende seu horário</h2>
-    <form action="https://formspree.io/f/xnndyjra" method="POST" id="bookingForm" novalidate>
+    <form id="bookingForm" novalidate>
       <label for="service">Selecione o serviço:</label>
       <select id="service" name="service" required>
         <option value="" disabled selected>-- Escolha um serviço --</option>
@@ -154,7 +154,7 @@
       </select>
 
       <label for="date">Data do atendimento:</label>
-      <input type="date" id="date" name="date" required min="" />
+      <input type="date" id="date" name="date" required />
 
       <label for="time">Hora do atendimento:</label>
       <input type="time" id="time" name="time" required min="09:00" max="18:00" />
@@ -166,15 +166,15 @@
       <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com" />
 
       <label for="phone">Telefone (opcional):</label>
-      <input type="tel" id="phone" name="phone" placeholder="(xx) xxxx-xxxx ou (xx) xxxxx-xxxx" pattern="[\d\s\-\+$$]+" />
+      <input type="tel" id="phone" name="phone" placeholder="(xx) xxxx-xxxx ou (xx) xxxxx-xxxx" pattern="[\d\s\-\+]+" />
 
       <button type="submit">Agendar</button>
     </form> 
     <div class="confirmation" id="confirmationMessage"></div>
   </section>
 </main>
+
 <script>
-  // Set min date for the date input to today
   const dateInput = document.getElementById('date');
   const today = new Date().toISOString().split('T')[0];
   dateInput.setAttribute('min', today);
@@ -184,28 +184,23 @@
   const servicesListItems = document.querySelectorAll('ul.services-list li');
   const serviceSelect = document.getElementById('service');
 
-  // Remove animation class helper
   function removeAnimationClasses() {
-    servicesListItems.forEach(li => {
-      li.classList.remove('animate');
-    });
+    servicesListItems.forEach(li => li.classList.remove('animate'));
   }
 
-  // Listen for service selection changes and animate corresponding list item
   serviceSelect.addEventListener('change', () => {
     removeAnimationClasses();
     const selectedValue = serviceSelect.value;
     servicesListItems.forEach(li => {
       if (li.getAttribute('data-service') === selectedValue) {
-        // To restart animation if already applied, remove then add with timeout
         li.classList.remove('animate');
-        void li.offsetWidth; // trigger reflow to restart animation
+        void li.offsetWidth;
         li.classList.add('animate');
       }
     });
   });
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     if (!form.checkValidity()) {
@@ -213,34 +208,56 @@
       return;
     }
 
-    // Validate time within working hours (09:00 - 18:00)
     const time = document.getElementById('time').value;
     if (time < '09:00' || time > '18:00') {
       alert('Por favor, selecione um horário entre 09:00 e 18:00.');
       return;
     }
 
-    // Get form data
-    const service = form.service.value;
-    const date = form.date.value;
-    const timeSelected = time;
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const phone = form.phone.value.trim();
+    // Adicionei uma chamada --------------------------
+    //       (__)
+    //       (oo)____
+    //       (__)    )\\
+    //          ||--|| *
+    //   ~~~~~~~~~~~~~~~~
 
-    // Show a confirmation message
-    confirmation.style.display = 'block';
-    confirmation.innerHTML = `
-      Obrigado, <strong>${name}</strong>!<br/>
-      Seu agendamento para <strong>${service}</strong> está marcado para <strong>${date}</strong> às <strong>${timeSelected}</strong>.<br/>
-      Entraremos em contato pelo e-mail <strong>${email}</strong> para confirmar o horário.<br/>
-      ${phone ? 'Telefone: ' + phone + '<br/>' : ''}
-      Até breve!
-    `;
+    // EXPERIMENTAL - CHAMADA AO ENDPOINT - API
+    const formData = new FormData(form);
 
-    // Reset form
-    form.reset();
-    removeAnimationClasses();
+    try {
+      const response = await fetch("https://usebasin.com/f/2103aa2d618c", {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" }
+      });
+
+      console.log(response, 'verificando retorno xibata');
+      
+      if (response.ok) {
+        const name = form.name.value.trim();
+        const service = form.service.value;
+        const date = form.date.value;
+        const timeSelected = form.time.value;
+        const email = form.email.value.trim();
+        const phone = form.phone.value.trim();
+
+        confirmation.style.display = 'block';
+        confirmation.innerHTML = `
+          Obrigado, <strong>${name}</strong>!<br/>
+          Seu agendamento para <strong>${service}</strong> está marcado para <strong>${date}</strong> às <strong>${timeSelected}</strong>.<br/>
+          Entraremos em contato pelo e-mail <strong>${email}</strong> para confirmar o horário.<br/>
+          ${phone ? 'Telefone: ' + phone + '<br/>' : ''}
+          Até breve!
+        `;
+
+        form.reset();
+        removeAnimationClasses();
+      } else {
+        alert("Houve um erro ao enviar o formulário. Tente novamente mais tarde.");
+      }
+    } catch (error) {
+      alert("Erro de conexão. Verifique sua internet.");
+    }
   });
 </script>
 </body>
